@@ -25,5 +25,7 @@ stages:
           runOnce:
             deploy:
               steps:
-              - script: sudo docker run -dit -p 80:80 raggupta/sampleazapp:$(Build.SourceVersion)
+              - script: |
+                  sudo docker rm -f $(docker ps -aq)
+                  sudo docker run -dit -p 80:80 raggupta/sampleazapp:$(Build.SourceVersion)
 
