@@ -1,31 +1,30 @@
-stages:
-  - stage: "build_index"
-    jobs:
-      - job: "build"
-        steps:
-          - task: Docker@2
-            inputs:
-              containerRegistry: "docker-registry"
-              repository: "raggupta/sampleazapp"
-              tags: $(Build.SourceVersion)
-              command: "buildAndPush"
-              Dockerfile: "**/Dockerfile"
-
-  - stage: "deploy_index_html"
-    dependsOn: 
-      - build_index
-    jobs:
-      - deployment: VMDeploy
-        displayName: Web deploy
-        environment:
-          name: Dev
-          resourceType: VirtualMachine
-          tags: docker,aws-linux
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - script: |
-                  sudo docker rm -f $(docker ps -aq)
-                  sudo docker run -dit -p 80:80 raggupta/sampleazapp:$(Build.SourceVersion)
-
+trigger:
+  - master 
+    
+stages: 
+ - stage: 'build'
+   jobs:
+    - job: 'build'
+      steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'docker-registry'
+          repository: 'raggupta/sampleazdevops'
+          command: 'buildAndPush'
+          tags: $(Build.BuildId)
+          Dockerfile: '**/Dockerfile'
+ - stage: 'deploy'
+   jobs:
+    - deployment: VMDeploy
+      displayName: Web deploy
+      environment:
+        name: dev
+        resourceType: VirtualMachine
+        tags: web,docker,linux
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: |
+                sudo docker rm -f $(docker ps -aq)
+                sudo docker run -dit -p 80:80  raggupta/sampleazdevops:$(Build.BuildId)
