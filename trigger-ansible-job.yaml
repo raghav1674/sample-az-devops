@@ -9,4 +9,5 @@ variables:
 steps: 
   - script: |
       echo 'running the Ansible tower job'
+      echo $(test)
       curl -XPOST http://3.238.58.152/api/v2/job_templates/$(jobTemplateId)/launch/ -u '$(awxUsername):$(awxPassword)'
